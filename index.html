@@ -45,26 +45,62 @@
 
 <h1>חידון אנטומיה</h1>
 <div id="quiz"></div>
+<button id="prevBtn" onclick="prevQuestion()">חזרה לשאלה הקודמת</button>
 <button id="nextBtn" onclick="nextQuestion()">לשאלה הבאה</button>
 
 <script>
-const anterior = [
-  "Sternocleidomastoid", "Scalenes", "Deltoids", "Serratus anterior", "Rectus abdominis",
-  "Brachioradialis", "External oblique", "Tensor fasciae latae", "Sartorius", "Quadriceps femoris",
-  "Gastrocnemius", "Peroneus", "Soleus", "Extensor digitorum longus", "Tibialis anterior",
-  "Adductors", "Pronator teres", "Flexors", "Biceps brachii", "Pectoralis major", "Subclavius"
+const muscles = [
+  ["Sternocleidomastoid", "", "קדמית", "1"],
+  ["Scalenes", "", "קדמית", "2"],
+  ["Deltoids", "", "קדמית", "3"],
+  ["Serratus anterior", "", "קדמית", "4"],
+  ["Rectus abdominis", "", "קדמית", "5"],
+  ["Brachioradialis", "", "קדמית", "6"],
+  ["External oblique", "", "קדמית", "7"],
+  ["Tensor fasciae latae", "", "קדמית", "8"],
+  ["Sartorius", "", "קדמית", "8a"],
+  ["quadriceps - Rectus femoris", "", "קדמית", "9.1"],
+  ["quadriceps - Vastus lateralis", "", "קדמית", "9.2"],
+  ["quadriceps - Vastus medialis", "", "קדמית", "9.3"],
+  ["Gastrocnemius", "", "קדמית", "10"],
+  ["Peroneus", "", "קדמית", "11"],
+  ["Soleus", "", "קדמית", "12"],
+  ["Extensor digitorum longus", "", "קדמית", "13"],
+  ["Tibialis anterior", "", "קדמית", "14"],
+  ["Adductor - pectineus", "", "קדמית", "15.1"],
+  ["Adductor - brevis", "", "קדמית", "15.2"],
+  ["Adductor - longus", "", "קדמית", "15.3"],
+  ["Flexors", "", "קדמית", "16"],
+  ["Pronator teres", "", "קדמית", "17"],
+  ["Biceps brachii", "", "קדמית", "18"],
+  ["Pectoralis major", "", "קדמית", "19"],
+  ["Subclavius", "", "קדמית", "20"],
+  ["Splenius capitis", "", "אחורית", "1"],
+  ["Trapezius", "", "אחורית", "2"],
+  ["Deltoids", "", "אחורית", "3"],
+  ["Teres minor", "", "אחורית", "4"],
+  ["Teres major", "", "אחורית", "5"],
+  ["Triceps brachii", "", "אחורית", "6"],
+  ["Latissimus dorsi", "", "אחורית", "7"],
+  ["External oblique", "", "אחורית", "8"],
+  ["Gluteus medius", "", "אחורית", "9"],
+  ["Gluteus maximus", "", "אחורית", "10"],
+  ["Extensors", "", "אחורית", "11"],
+  ["Hamstrings - Semimembranosus", "", "אחורית", "12.1"],
+  ["Hamstrings - Semitendonosis", "", "אחורית", "12.2"],
+  ["Hamstrings - biceps femoris", "", "אחורית", "12.3"],
+  ["Gracilis", "", "אחורית", "13"],
+  ["Gastrocnemius", "", "אחורית", "14"],
+  ["Soleus", "", "אחורית", "15"],
+  ["Achilles tendon", "", "אחורית", "16"],
+  ["Erector spinae", "", "אחורית", "17"],
+  ["Quadratus lumborum", "", "אחורית", "18"],
+  ["Levator scapula", "", "אחורית", "19"],
+  ["Rhomboids", "", "אחורית", "20"],
+  ["Supraspinatus", "", "אחורית", "21"],
+  ["Infraspinatus", "", "אחורית", "22"],
+  ["Teres minor", "", "אחורית", "23"]
 ];
-
-const posterior = [
-  "Splenius capitis", "Trapezius", "Deltoids", "Teres minor", "Teres major",
-  "Triceps brachii", "Latissimus dorsi", "External oblique", "Gluteus medius", "Gluteus maximus",
-  "Extensors", "Hamstrings", "Gracilis", "Gastrocnemius", "Soleus", "Achilles tendon",
-  "Erector spinae", "Quadratus lumborum", "Levator scapula", "Rhomboids",
-  "Supraspinatus", "Infraspinatus", "Teres minor"
-];
-
-const muscles = [...anterior.map((m, i) => [m, "", "קדמית", i + 1]),
-                  ...posterior.map((m, i) => [m, "", "אחורית", i + 1])];
 
 const translations = {
   "Sternocleidomastoid": "סטרנוקלידומסטואיד",
@@ -76,15 +112,19 @@ const translations = {
   "External oblique": "אקסטרנל אובליק",
   "Tensor fasciae latae": "טנסור פשיה לאטה",
   "Sartorius": "סרטוריוס",
-  "Quadriceps femoris": "קוודריספס פמוריס",
+  "quadriceps - Rectus femoris": "קוודריספס - רקטוס פמוריס",
+  "quadriceps - Vastus lateralis": "קוודריספס - וסטוס לטראליס",
+  "quadriceps - Vastus medialis": "קוודריספס - וסטוס מדיאליס",
   "Gastrocnemius": "גסטרוקנמיוס",
   "Peroneus": "פרונאוס",
   "Soleus": "סולאוס",
   "Extensor digitorum longus": "אקסטנסור דיגיטורום לונגוס",
   "Tibialis anterior": "טיביאליס אנטריור",
-  "Adductors": "אדוקטורס",
-  "Pronator teres": "פרונייטור טרס",
+  "Adductor - pectineus": "אדוקטור - פקטינאוס",
+  "Adductor - brevis": "אדוקטור - ברביס",
+  "Adductor - longus": "אדוקטור - לונגוס",
   "Flexors": "פלקסורס",
+  "Pronator teres": "פרונייטור טרס",
   "Biceps brachii": "בייספס בראכי",
   "Pectoralis major": "פקטורליס מייג'ור",
   "Subclavius": "סאבקלביוס",
@@ -97,7 +137,9 @@ const translations = {
   "Gluteus medius": "גלוטאוס מדיוס",
   "Gluteus maximus": "גלוטאוס מקסימוס",
   "Extensors": "אקסטנסורס",
-  "Hamstrings": "האמסטרינגס",
+  "Hamstrings - Semimembranosus": "האמסטרינגס - סמיממברנוסוס",
+  "Hamstrings - Semitendonosis": "האמסטרינגס - סמיטנדינוסוס",
+  "Hamstrings - biceps femoris": "האמסטרינגס - בייספס פמוריס",
   "Gracilis": "גרסיליס",
   "Achilles tendon": "גיד אכילס",
   "Erector spinae": "ארקטור ספייני",
@@ -108,63 +150,113 @@ const translations = {
   "Infraspinatus": "אינפרספינטוס"
 };
 
-muscles.forEach(m => m[1] = translations[m[0]]);
+let currentQuestionIndex = 0;
+let currentQuestions = [];
 
-const quiz = document.getElementById("quiz");
-const nextBtn = document.getElementById("nextBtn");
-let score = 0, current = 0;
-const questions = muscles.map((m, i) => ({...m})).sort(() => 0.5 - Math.random());
-
-function buildQuestion(n) {
-  const [eng, heb, side, number] = [questions[n][0], questions[n][1], questions[n][2], questions[n][3]];
-  const correctIndex = muscles.findIndex(m => m[0] === eng);
-  const wrong = muscles.filter((_, i) => i !== correctIndex).sort(() => 0.5 - Math.random()).slice(0, 3);
-  const opts = [...wrong, [eng, heb]].sort(() => 0.5 - Math.random());
-  const letters = ["a", "b", "c", "d"];
-  const div = document.createElement("div");
-  let label;
-  if (side === "קדמית") {
-    if (eng === "Rectus femoris") label = "9.1";
-    else if (eng === "Vastus lateralis") label = "9.2";
-    else if (eng === "Vastus medialis") label = "9.3";
-    else if (eng === "Adductor longus") label = "15.1";
-    else if (eng === "Adductor brevis") label = "15.2";
-    else if (eng === "Adductor magnus") label = "15.3";
-    else label = ++anteriorCount;
-  } else {
-    if (eng === "Biceps femoris") label = "12.1";
-    else if (eng === "Semitendinosus") label = "12.2";
-    else if (eng === "Semimembranosus") label = "12.3";
-    else label = ++posteriorCount;
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
-  div.className = "question" + (n ? " hidden" : "");
-  div.id = "q" + n;
-  div.innerHTML = `<p><strong>${n + 1}. מהו השריר שמסומן במספר ${number} (${side})?</strong></p>
-                   <p>בחרי תשובה:</p>` +
-    opts.map((o, i) => `<button data-right="${o[0] === eng}" onclick="check(this)">${letters[i]}) ${o[0]} (${o[1]})</button>`).join("<br>");
-  return div;
+  return array;
 }
 
-questions.forEach((_, i) => quiz.appendChild(buildQuestion(i)));
+function getRandomQuestion() {
+  const side = Math.random() < 0.5 ? "קדמית" : "אחורית";
+  const sideMuscles = muscles.filter(m => m[2] === side);
+  const randomMuscle = sideMuscles[Math.floor(Math.random() * sideMuscles.length)];
+  const correctName = randomMuscle[0];
+  const number = randomMuscle[3];
 
-function check(btn) {
-  const correct = btn.dataset.right === "true";
-  btn.style.background = correct ? "#4caf50" : "#f44336";
-  if (correct) score++;
-  [...btn.parentNode.querySelectorAll("button")]
-    .filter(b => b.dataset.right === "true").forEach(b => b.style.background = "#4caf50");
-  nextBtn.style.display = "inline-block";
+  let incorrectMuscles = sideMuscles.filter(m => m[0] !== correctName);
+  incorrectMuscles = shuffle(incorrectMuscles).slice(0, 3).map(m => m[0]);
+
+  const answers = shuffle([correctName, ...incorrectMuscles]);
+
+  return {
+    side,
+    number,
+    correct: correctName,
+    answers
+  };
+}
+
+function displayQuestion() {
+  const quizDiv = document.getElementById("quiz");
+  quizDiv.innerHTML = "";
+
+  const q = getRandomQuestion();
+  currentQuestions.push(q);
+
+  const questionBox = document.createElement("div");
+  questionBox.className = "question";
+  questionBox.innerHTML = `<h3>מהו השריר במספר ${q.number} (${q.side})?</h3>`;
+
+  q.answers.forEach(answer => {
+    const btn = document.createElement("button");
+    btn.textContent = translations[answer] || answer;
+    btn.onclick = function () {
+      const allButtons = document.querySelectorAll("button");
+      allButtons.forEach(b => b.disabled = true);
+      if (answer === q.correct) {
+        btn.style.background = "lightgreen";
+      } else {
+        btn.style.background = "salmon";
+        const correctBtn = [...allButtons].find(b => b.textContent === (translations[q.correct] || q.correct));
+        if (correctBtn) correctBtn.style.background = "lightgreen";
+      }
+      document.getElementById("nextBtn").style.display = "inline-block";
+    };
+    questionBox.appendChild(btn);
+  });
+
+  quizDiv.appendChild(questionBox);
 }
 
 function nextQuestion() {
-  document.getElementById("q" + current).classList.add("hidden");
-  current++;
-  nextBtn.style.display = "none";
-  if (current < questions.length)
-    document.getElementById("q" + current).classList.remove("hidden");
-  else quiz.innerHTML = `<h2>סיימת! ${score} / ${questions.length}</h2>`;
+  document.getElementById("nextBtn").style.display = "none";
+  displayQuestion();
 }
-</script>
 
+function prevQuestion() {
+  if (currentQuestions.length > 1) {
+    currentQuestions.pop(); // remove current
+    const prev = currentQuestions.pop(); // get previous
+    document.getElementById("nextBtn").style.display = "none";
+    displayQuestionWithData(prev);
+  }
+}
+
+function displayQuestionWithData(q) {
+  const quizDiv = document.getElementById("quiz");
+  quizDiv.innerHTML = "";
+
+  const questionBox = document.createElement("div");
+  questionBox.className = "question";
+  questionBox.innerHTML = `<h3>מהו השריר במספר ${q.number} (${q.side})?</h3>`;
+
+  q.answers.forEach(answer => {
+    const btn = document.createElement("button");
+    btn.textContent = translations[answer] || answer;
+    btn.onclick = function () {
+      const allButtons = document.querySelectorAll("button");
+      allButtons.forEach(b => b.disabled = true);
+      if (answer === q.correct) {
+        btn.style.background = "lightgreen";
+      } else {
+        btn.style.background = "salmon";
+        const correctBtn = [...allButtons].find(b => b.textContent === (translations[q.correct] || q.correct));
+        if (correctBtn) correctBtn.style.background = "lightgreen";
+      }
+      document.getElementById("nextBtn").style.display = "inline-block";
+    };
+    questionBox.appendChild(btn);
+  });
+
+  quizDiv.appendChild(questionBox);
+}
+
+window.onload = displayQuestion;
+</script>
 </body>
 </html>
