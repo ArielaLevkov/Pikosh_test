@@ -256,7 +256,12 @@ function displayQuestionWithData(q) {
   quizDiv.appendChild(questionBox);
 }
 
-window.onload = displayQuestion;
+window.onload = () => {
+  currentQuestions = [];
+  const q = getRandomQuestion();
+  currentQuestions.push(q);
+  displayQuestionWithData(q);
+};
 </script>
 </body>
 </html>
