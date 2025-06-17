@@ -4,11 +4,59 @@
 <meta charset="UTF-8">
 <title>חידון אנטומיה - 43 שרירים</title>
 <style>
- body{font-family:Arial;direction:rtl;text-align:center}
- .question{margin:20px auto;padding:20px;width:90%;max-width:600px;border:1px solid #ccc;border-radius:10px}
- button{margin:6px;padding:8px 20px;background:#ddd;border:none;border-radius:6px;cursor:pointer}
- button:hover{opacity:.9}
- .hidden{display:none}
+  body {
+    font-family: Arial, sans-serif;
+    direction: rtl;
+    text-align: center;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2em;
+    margin-bottom: 30px;
+  }
+
+  .question {
+    margin: 20px auto;
+    padding: 20px;
+    width: 95%;
+    max-width: 600px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 1.4em;
+  }
+
+  button {
+    display: block;
+    width: 90%;
+    max-width: 400px;
+    margin: 10px auto;
+    padding: 16px;
+    font-size: 1.2em;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+
+  button:hover {
+    background: #d5d5d5;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  @media screen and (max-width: 500px) {
+    h1 { font-size: 1.6em; }
+    .question { font-size: 1.2em; padding: 15px; }
+    button { font-size: 1em; padding: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -78,7 +126,8 @@ function buildQuestion(n){
   div.innerHTML = `<p><strong>${n+1}. מהו השריר שמסומן בתמונה ${questions[n].index+1} (${side})?</strong></p>
                    <p>בחרי תשובה:</p>` +
     opts.map((o,i)=>`<button data-right="${o[0]===eng}" onclick="check(this)">
-      ${letters[i]}) ${o[0]} (${o[1]})</button>`).join("<br>");
+      ${letters[i]}) ${o[0]} (${o[1]})</button>`).join("") +
+    `<button class="hidden" id="nextBtn${n}" onclick="next()">שאלה הבאה</button>`;
   return div;
 }
 
@@ -92,14 +141,19 @@ function check(btn){
   if(correct) score++;
   [...btn.parentNode.querySelectorAll("button")]
      .filter(b=>b.dataset.right==="true").forEach(b=>b.style.background="#4caf50");
-  setTimeout(()=>{
-    document.getElementById("q"+current).classList.add("hidden");
-    current++
-    if(current < questions.length)
-      document.getElementById("q"+current).classList.remove("hidden");
-    else quiz.innerHTML=`<h2>סיימת! ${score} / ${questions.length}</h2>`;
-  }, 1200);
+  document.getElementById("nextBtn"+current).classList.remove("hidden");
+}
+
+function next(){
+  document.getElementById("q"+current).classList.add("hidden");
+  current++;
+  if(current < questions.length){
+    document.getElementById("q"+current).classList.remove("hidden");
+  } else {
+    quiz.innerHTML = `<h2>סיימת! ${score} / ${questions.length}</h2>`;
+  }
 }
 </script>
+
 </body>
 </html>
