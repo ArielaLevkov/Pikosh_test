@@ -215,7 +215,9 @@ function displayQuestion() {
 
 function nextQuestion() {
   document.getElementById("nextBtn").style.display = "none";
-  displayQuestion();
+  const q = getRandomQuestion();
+  currentQuestions.push(q);
+  displayQuestionWithData(q);
 }
 
 function prevQuestion() {
