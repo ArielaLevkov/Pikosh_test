@@ -1,68 +1,51 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-<meta charset="UTF-8">
-<title>חידון אנטומיה - 43 שרירים</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    direction: rtl;
-    text-align: center;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 20px;
-  }
-
-  h1 {
-    font-size: 2em;
-    margin-bottom: 30px;
-  }
-
-  .question {
-    margin: 20px auto;
-    padding: 20px;
-    width: 95%;
-    max-width: 600px;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    font-size: 1.4em;
-  }
-
-  button {
-    display: block;
-    width: 90%;
-    max-width: 400px;
-    margin: 10px auto;
-    padding: 16px;
-    font-size: 1.2em;
-    background: #e0e0e0;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-  }
-
-  button:hover {
-    background: #d5d5d5;
-  }
-
-  .hidden {
-    display: none;
-  }
-
-  @media screen and (max-width: 500px) {
-    h1 { font-size: 1.6em; }
-    .question { font-size: 1.2em; padding: 15px; }
-    button { font-size: 1em; padding: 14px; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>חידון אנטומיה - 43 שרירים</title>
+  <style>
+    body {
+      font-family: Arial;
+      direction: rtl;
+      text-align: center;
+      font-size: 1.4em;
+      padding: 10px;
+    }
+    .question {
+      margin: 20px auto;
+      padding: 20px;
+      width: 95%;
+      max-width: 600px;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      background: #f9f9f9;
+    }
+    button {
+      margin: 10px;
+      padding: 14px 24px;
+      font-size: 1em;
+      background: #ddd;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: .9;
+    }
+    .hidden {
+      display: none;
+    }
+    #nextBtn {
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
 <h1>חידון אנטומיה: 43 השרירים</h1>
 <div id="quiz"></div>
+<button id="nextBtn" onclick="nextQuestion()">לשאלה הבאה</button>
 
 <script>
 const muscles = [
@@ -76,9 +59,9 @@ const muscles = [
   ["Tensor fasciae latae", "טנסור פשיה לאטה", "קדמית"],
   ["Sartorius", "סרטוריוס", "קדמית"],
   ["Quadriceps femoris", "קוודריספס פמוריס", "קדמית"],
-  ["Gastrocnemius", "גסטרוקנמיוס", "אחורית"],
+  ["Gastrocnemius", "גסטרוקנמיוס", "קדמית"],
   ["Peroneus", "פרונאוס", "קדמית"],
-  ["Soleus", "סולאוס", "אחורית"],
+  ["Soleus", "סולאוס", "קדמית"],
   ["Extensor digitorum longus", "אקססטנסור דיגיטורום לונגוס", "קדמית"],
   ["Tibialis anterior", "טיביאליס אנטריור", "קדמית"],
   ["Adductors", "אדוקטורס", "קדמית"],
@@ -97,7 +80,7 @@ const muscles = [
   ["Gluteus maximus", "גלוטאוס מקסימוס", "אחורית"],
   ["Extensors", "אקססטנסורס", "אחורית"],
   ["Hamstrings", "האמסטרינגס", "אחורית"],
-  ["Gracilis", "גרסיליס", "קדמית"],
+  ["Gracilis", "גרסיליס", "אחורית"],
   ["Achilles tendon", "אכילס טנדון", "אחורית"],
   ["Erector spinae", "ארקטור ספייני", "אחורית"],
   ["Quadratus lumborum", "קוודרטוס לומבורום", "אחורית"],
@@ -111,47 +94,49 @@ const muscles = [
   ["Gastrocnemius", "גסטרוקנמיוס", "אחורית"]
 ];
 
+const quiz = document.getElementById("quiz");
+const nextBtn = document.getElementById("nextBtn");
+let score = 0, current = 0;
+let anteriorCount = 0, posteriorCount = 0;
+
 const questions = muscles.map((m, i) => ({...m, index: i}));
 questions.sort(() => 0.5 - Math.random());
 
-function buildQuestion(n){
+function buildQuestion(n) {
   const [eng, heb, side] = [questions[n][0], questions[n][1], questions[n][2]];
-  const correctIndex = muscles.findIndex(m => m[0] === eng && m[1] === heb);
-  const wrong = muscles.filter((_,i)=>i!==correctIndex).sort(()=>0.5-Math.random()).slice(0,3);
-  const opts = [...wrong, [eng,heb]].sort(()=>0.5-Math.random());
-  const letters = ["a","b","c","d"];
+  const correctIndex = muscles.findIndex(m => m[0] === eng);
+  const wrong = muscles.filter((_, i) => i !== correctIndex).sort(() => 0.5 - Math.random()).slice(0, 3);
+  const opts = [...wrong, [eng, heb]].sort(() => 0.5 - Math.random());
+  const letters = ["a", "b", "c", "d"];
+  const num = side === "קדמית" ? ++anteriorCount : ++posteriorCount;
+
   const div = document.createElement("div");
   div.className = "question" + (n ? " hidden" : "");
-  div.id = "q"+n;
-  div.innerHTML = `<p><strong>${n+1}. מהו השריר שמסומן בתמונה ${questions[n].index+1} (${side})?</strong></p>
+  div.id = "q" + n;
+  div.innerHTML = `<p><strong>${n + 1}. מהו השריר שמסומן בתמונה ${num} (${side})?</strong></p>
                    <p>בחרי תשובה:</p>` +
-    opts.map((o,i)=>`<button data-right="${o[0]===eng}" onclick="check(this)">
-      ${letters[i]}) ${o[0]} (${o[1]})</button>`).join("") +
-    `<button class="hidden" id="nextBtn${n}" onclick="next()">שאלה הבאה</button>`;
+    opts.map((o, i) => `<button data-right="${o[0] === eng}" onclick="check(this)">${letters[i]}) ${o[0]} (${o[1]})</button>`).join("<br>");
   return div;
 }
 
-const quiz = document.getElementById("quiz");
-questions.forEach((_,i)=>quiz.appendChild(buildQuestion(i)));
+questions.forEach((_, i) => quiz.appendChild(buildQuestion(i)));
 
-let score=0, current=0;
-function check(btn){
-  const correct = btn.dataset.right==="true";
-  btn.style.background=correct?"#4caf50":"#f44336";
-  if(correct) score++;
+function check(btn) {
+  const correct = btn.dataset.right === "true";
+  btn.style.background = correct ? "#4caf50" : "#f44336";
+  if (correct) score++;
   [...btn.parentNode.querySelectorAll("button")]
-     .filter(b=>b.dataset.right==="true").forEach(b=>b.style.background="#4caf50");
-  document.getElementById("nextBtn"+current).classList.remove("hidden");
+    .filter(b => b.dataset.right === "true").forEach(b => b.style.background = "#4caf50");
+  nextBtn.style.display = "inline-block";
 }
 
-function next(){
-  document.getElementById("q"+current).classList.add("hidden");
+function nextQuestion() {
+  document.getElementById("q" + current).classList.add("hidden");
   current++;
-  if(current < questions.length){
-    document.getElementById("q"+current).classList.remove("hidden");
-  } else {
-    quiz.innerHTML = `<h2>סיימת! ${score} / ${questions.length}</h2>`;
-  }
+  nextBtn.style.display = "none";
+  if (current < questions.length)
+    document.getElementById("q" + current).classList.remove("hidden");
+  else quiz.innerHTML = `<h2>סיימת! ${score} / ${questions.length}</h2>`;
 }
 </script>
 
