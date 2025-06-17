@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<title>חידון אנטומיה - 43 שרירים</title>
+<style>
+ body{font-family:Arial;direction:rtl;text-align:center}
+ .question{margin:20px auto;padding:20px;width:90%;max-width:600px;border:1px solid #ccc;border-radius:10px}
+ button{margin:6px;padding:8px 20px;background:#ddd;border:none;border-radius:6px;cursor:pointer}
+ button:hover{opacity:.9}
+ .hidden{display:none}
+</style>
+</head>
+<body>
+
+<h1>חידון אנטומיה: 43 השרירים</h1>
+<div id="quiz"></div>
+
+<script>
+const muscles = [
+  ["Sternocleidomastoid", "סטרנוקלידומסטואיד", "קדמית"],
+  ["Scalenes", "סקאלנז", "קדמית"],
+  ["Deltoids", "דלטואידס", "קדמית"],
+  ["Serratus anterior", "סרייטוס אנטריור", "קדמית"],
+  ["Rectus abdominis", "רקטוס אבדומיניס", "קדמית"],
+  ["Brachioradialis", "ברכיאורדיאליס", "קדמית"],
+  ["External oblique", "אקסטרנל אובליק", "קדמית"],
+  ["Tensor fasciae latae", "טנסור פשיה לאטה", "קדמית"],
+  ["Sartorius", "סרטוריוס", "קדמית"],
+  ["Quadriceps femoris", "קוודריספס פמוריס", "קדמית"],
+  ["Gastrocnemius", "גסטרוקנמיוס", "אחורית"],
+  ["Peroneus", "פרונאוס", "קדמית"],
+  ["Soleus", "סולאוס", "אחורית"],
+  ["Extensor digitorum longus", "אקססטנסור דיגיטורום לונגוס", "קדמית"],
+  ["Tibialis anterior", "טיביאליס אנטריור", "קדמית"],
+  ["Adductors", "אדוקטורס", "קדמית"],
+  ["Pronator teres", "פרונייטור טירס", "קדמית"],
+  ["Flexors", "פלקסורס", "קדמית"],
+  ["Biceps brachii", "בייספס בראכי", "קדמית"],
+  ["Pectoralis major", "פקטורליס מייג'ור", "קדמית"],
+  ["Subclavius", "סאבקלביוס", "קדמית"],
+  ["Splenius capitis", "ספלניוס קפיטיס", "אחורית"],
+  ["Trapezius", "טרפזיוס", "אחורית"],
+  ["Teres minor", "טרס מיינור", "אחורית"],
+  ["Teres major", "טרס מייג'ור", "אחורית"],
+  ["Triceps brachii", "טרייספס בראכי", "אחורית"],
+  ["Latissimus dorsi", "לטיסימוס דורסי", "אחורית"],
+  ["Gluteus medius", "גלוטאוס מדיוס", "אחורית"],
+  ["Gluteus maximus", "גלוטאוס מקסימוס", "אחורית"],
+  ["Extensors", "אקססטנסורס", "אחורית"],
+  ["Hamstrings", "האמסטרינגס", "אחורית"],
+  ["Gracilis", "גרסיליס", "קדמית"],
+  ["Achilles tendon", "אכילס טנדון", "אחורית"],
+  ["Erector spinae", "ארקטור ספייני", "אחורית"],
+  ["Quadratus lumborum", "קוודרטוס לומבורום", "אחורית"],
+  ["Levator scapula", "לבטור סקפולה", "אחורית"],
+  ["Rhomboids", "רומבוידס", "אחורית"],
+  ["Supraspinatus", "סופרספינטוס", "אחורית"],
+  ["Infraspinatus", "אינפרספינטוס", "אחורית"],
+  ["Deltoids", "דלטואידס", "אחורית"],
+  ["External oblique", "אקסטרנל אובליק", "אחורית"],
+  ["Teres minor", "טרס מיינור", "אחורית"],
+  ["Gastrocnemius", "גסטרוקנמיוס", "אחורית"]
+];
+
+const questions = muscles.map((m, i) => ({...m, index: i}));
+questions.sort(() => 0.5 - Math.random());
+
+function buildQuestion(n){
+  const [eng, heb, side] = [questions[n][0], questions[n][1], questions[n][2]];
+  const correctIndex = muscles.findIndex(m => m[0] === eng && m[1] === heb);
+  const wrong = muscles.filter((_,i)=>i!==correctIndex).sort(()=>0.5-Math.random()).slice(0,3);
+  const opts = [...wrong, [eng,heb]].sort(()=>0.5-Math.random());
+  const letters = ["a","b","c","d"];
+  const div = document.createElement("div");
+  div.className = "question" + (n ? " hidden" : "");
+  div.id = "q"+n;
+  div.innerHTML = `<p><strong>${n+1}. מהו השריר שמסומן בתמונה ${questions[n].index+1} (${side})?</strong></p>
+                   <p>בחרי תשובה:</p>` +
+    opts.map((o,i)=>`<button data-right="${o[0]===eng}" onclick="check(this)">
+      ${letters[i]}) ${o[0]} (${o[1]})</button>`).join("<br>");
+  return div;
+}
+
+const quiz = document.getElementById("quiz");
+questions.forEach((_,i)=>quiz.appendChild(buildQuestion(i)));
+
+let score=0, current=0;
+function check(btn){
+  const correct = btn.dataset.right==="true";
+  btn.style.background=correct?"#4caf50":"#f44336";
+  if(correct) score++;
+  [...btn.parentNode.querySelectorAll("button")]
+     .filter(b=>b.dataset.right==="true").forEach(b=>b.style.background="#4caf50");
+  setTimeout(()=>{
+    document.getElementById("q"+current).classList.add("hidden");
+    current++
+    if(current < questions.length)
+      document.getElementById("q"+current).classList.remove("hidden");
+    else quiz.innerHTML=`<h2>סיימת! ${score} / ${questions.length}</h2>`;
+  }, 1200);
+}
+</script>
+</body>
+</html>
