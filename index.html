@@ -194,9 +194,9 @@ function displayQuestion() {
 
   q.answers.forEach(answer => {
     const btn = document.createElement("button");
-    btn.textContent = translations[answer] || answer;
+    btn.textContent = `${answer} — ${translations[answer] || ""}`;
     btn.onclick = function () {
-      const allButtons = document.querySelectorAll("button");
+      const allButtons = questionBox.querySelectorAll("button");
       allButtons.forEach(b => b.disabled = true);
       if (answer === q.correct) {
         btn.style.background = "lightgreen";
@@ -239,9 +239,9 @@ function displayQuestionWithData(q) {
 
   q.answers.forEach(answer => {
     const btn = document.createElement("button");
-    btn.textContent = translations[answer] || answer;
+    btn.textContent = `${answer} — ${translations[answer] || ""}`;
     btn.onclick = function () {
-      const allButtons = document.querySelectorAll("button");
+      const allButtons = questionBox.querySelectorAll("button");
       allButtons.forEach(b => b.disabled = true);
       if (answer === q.correct) {
         btn.style.background = "lightgreen";
