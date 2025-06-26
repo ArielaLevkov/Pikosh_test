@@ -202,7 +202,8 @@ function displayQuestion() {
         btn.style.background = "lightgreen";
       } else {
         btn.style.background = "salmon";
-        const correctBtn = [...allButtons].find(b => b.textContent === (translations[q.correct] || q.correct));
+        const correctText = `${q.correct} — ${translations[q.correct] || ""}`;
+        const correctBtn = [...allButtons].find(b => b.textContent === correctText);
         if (correctBtn) correctBtn.style.background = "lightgreen";
       }
       document.getElementById("nextBtn").style.display = "inline-block";
@@ -247,7 +248,8 @@ function displayQuestionWithData(q) {
         btn.style.background = "lightgreen";
       } else {
         btn.style.background = "salmon";
-        const correctBtn = [...allButtons].find(b => b.textContent === (translations[q.correct] || q.correct));
+        const correctText = `${q.correct} — ${translations[q.correct] || ""}`;
+        const correctBtn = [...allButtons].find(b => b.textContent === correctText);
         if (correctBtn) correctBtn.style.background = "lightgreen";
       }
       document.getElementById("nextBtn").style.display = "inline-block";
