@@ -2,7 +2,7 @@
 <html lang="he">
 <head>
   <meta charset="UTF-8">
-  <title>חידון לפיקוש: אנטומיה - זיהוי שרירים</title>
+  <title>חידון אנטומיה - זיהוי שרירים</title>
   <style>
     body {
       font-family: Arial;
@@ -32,18 +32,39 @@
     button:hover {
       opacity: .9;
     }
-    .hidden {
-      display: none;
-    }
     #nextBtn {
       margin-top: 20px;
       display: none;
+    }
+    #score {
+      margin: 20px auto;
+      font-size: 1.2em;
+      background: #e0f7fa;
+      padding: 10px;
+      border-radius: 8px;
+      width: fit-content;
+    }
+    #progressBar {
+      margin: 10px auto;
+      width: 80%;
+      height: 24px;
+      background: #eee;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    #progressFill {
+      height: 100%;
+      width: 0;
+      background: #4caf50;
+      transition: width 0.3s ease;
     }
   </style>
 </head>
 <body>
 
 <h1>חידון אנטומיה</h1>
+<div id="score">שאלות נכונות: 0 | שגויות: 0</div>
+<div id="progressBar"><div id="progressFill"></div></div>
 <div id="quiz"></div>
 <button id="prevBtn" onclick="prevQuestion()">חזרה לשאלה הקודמת</button>
 <button id="nextBtn" onclick="nextQuestion()">לשאלה הבאה</button>
@@ -75,8 +96,7 @@ const muscles = [
   ["Biceps brachii", "", "קדמית", "18"],
   ["Pectoralis major", "", "קדמית", "19"],
   ["Subclavius", "", "קדמית", "20"],
-  ["Splenius capitis", "", "אחורית", "1"],
-  ["Trapezius", "", "אחורית", "2"],
+  ["Trapezius", "", "אחורית", "1"],
   ["Deltoids", "", "אחורית", "3"],
   ["Teres minor", "", "אחורית", "4"],
   ["Teres major", "", "אחורית", "5"],
@@ -92,14 +112,7 @@ const muscles = [
   ["Gracilis", "", "אחורית", "13"],
   ["Gastrocnemius", "", "אחורית", "14"],
   ["Soleus", "", "אחורית", "15"],
-  ["Achilles tendon", "", "אחורית", "16"],
-  ["Erector spinae", "", "אחורית", "17"],
-  ["Quadratus lumborum", "", "אחורית", "18"],
-  ["Levator scapula", "", "אחורית", "19"],
-  ["Rhomboids", "", "אחורית", "20"],
-  ["Supraspinatus", "", "אחורית", "21"],
-  ["Infraspinatus", "", "אחורית", "22"],
-  ["Teres minor", "", "אחורית", "23"]
+  ["Achilles tendon", "", "אחורית", "16"]
 ];
 
 const translations = {
@@ -128,7 +141,6 @@ const translations = {
   "Biceps brachii": "בייספס בראכי",
   "Pectoralis major": "פקטורליס מייג'ור",
   "Subclavius": "סאבקלביוס",
-  "Splenius capitis": "ספלניוס קפיטיס",
   "Trapezius": "טרפזיוס",
   "Teres minor": "טרס מיינור",
   "Teres major": "טרס מייג'ור",
@@ -141,17 +153,21 @@ const translations = {
   "Hamstrings - Semitendonosis": "האמסטרינגס - סמיטנדינוסוס",
   "Hamstrings - biceps femoris": "האמסטרינגס - בייספס פמוריס",
   "Gracilis": "גרסיליס",
-  "Achilles tendon": "גיד אכילס",
-  "Erector spinae": "ארקטור ספייני",
-  "Quadratus lumborum": "קוודרטוס לומבורום",
-  "Levator scapula": "לבטור סקפולה",
-  "Rhomboids": "רומבוידס",
-  "Supraspinatus": "סופרספינטוס",
-  "Infraspinatus": "אינפרספינטוס"
+  "Achilles tendon": "גיד אכילס"
 };
 
-let currentQuestionIndex = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let usedQuestions = new Set();
 let currentQuestions = [];
+const totalQuestions = muscles.length;
+
+function updateScore() {
+  const totalAnswered = correctCount + wrongCount;
+  const percentage = Math.round((totalAnswered / totalQuestions) * 100);
+  document.getElementById("score").textContent = `שאלות נכונות: ${correctCount} | שגויות: ${wrongCount}`;
+  document.getElementById("progressFill").style.width = percentage + "%";
+}
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -162,109 +178,74 @@ function shuffle(array) {
 }
 
 function getRandomQuestion() {
-  const side = Math.random() < 0.5 ? "קדמית" : "אחורית";
-  const sideMuscles = muscles.filter(m => m[2] === side);
-  const randomMuscle = sideMuscles[Math.floor(Math.random() * sideMuscles.length)];
+  const remaining = muscles.filter(m => !usedQuestions.has(m[2] + m[3]));
+  if (remaining.length === 0) {
+    alert("סיימת את כל השאלות! כל הכבוד!");
+    return null;
+  }
+  const randomMuscle = remaining[Math.floor(Math.random() * remaining.length)];
+  const side = randomMuscle[2];
   const correctName = randomMuscle[0];
   const number = randomMuscle[3];
-
+  const sideMuscles = muscles.filter(m => m[2] === side);
   let incorrectMuscles = sideMuscles.filter(m => m[0] !== correctName);
   incorrectMuscles = shuffle(incorrectMuscles).slice(0, 3).map(m => m[0]);
-
   const answers = shuffle([correctName, ...incorrectMuscles]);
-
-  return {
-    side,
-    number,
-    correct: correctName,
-    answers
-  };
+  usedQuestions.add(side + number);
+  return { side, number, correct: correctName, answers };
 }
 
-function displayQuestion() {
+function displayQuestionWithData(q) {
   const quizDiv = document.getElementById("quiz");
   quizDiv.innerHTML = "";
-
-  const q = getRandomQuestion();
-  currentQuestions.push(q);
-
   const questionBox = document.createElement("div");
   questionBox.className = "question";
   questionBox.innerHTML = `<h3>מהו השריר במספר ${q.number} (${q.side})?</h3>`;
-
   q.answers.forEach(answer => {
     const btn = document.createElement("button");
     btn.textContent = `${answer} — ${translations[answer] || ""}`;
-    btn.onclick = function () {
-      const allButtons = questionBox.querySelectorAll("button");
-      allButtons.forEach(b => b.disabled = true);
-      if (answer === q.correct) {
-        btn.style.background = "lightgreen";
-      } else {
-        btn.style.background = "salmon";
-        const correctText = `${q.correct} — ${translations[q.correct] || ""}`;
-        const correctBtn = [...allButtons].find(b => b.textContent === correctText);
-        if (correctBtn) correctBtn.style.background = "lightgreen";
-      }
-      document.getElementById("nextBtn").style.display = "inline-block";
-    };
+    btn.onclick = () => handleAnswer(btn, answer, q, questionBox);
     questionBox.appendChild(btn);
   });
-
   quizDiv.appendChild(questionBox);
+}
+
+function handleAnswer(button, answer, q, box) {
+  const allButtons = box.querySelectorAll("button");
+  allButtons.forEach(b => b.disabled = true);
+  if (answer === q.correct) {
+    button.style.background = "lightgreen";
+    correctCount++;
+  } else {
+    button.style.background = "salmon";
+    const correctText = `${q.correct} — ${translations[q.correct] || ""}`;
+    const correctBtn = [...allButtons].find(b => b.textContent === correctText);
+    if (correctBtn) correctBtn.style.background = "lightgreen";
+    wrongCount++;
+  }
+  updateScore();
+  document.getElementById("nextBtn").style.display = "inline-block";
 }
 
 function nextQuestion() {
   document.getElementById("nextBtn").style.display = "none";
   const q = getRandomQuestion();
+  if (!q) return;
   currentQuestions.push(q);
   displayQuestionWithData(q);
 }
 
 function prevQuestion() {
   if (currentQuestions.length > 1) {
-    currentQuestions.pop(); // remove current
-    const prev = currentQuestions.pop(); // get previous
+    currentQuestions.pop();
+    const prev = currentQuestions.pop();
     document.getElementById("nextBtn").style.display = "none";
     displayQuestionWithData(prev);
   }
 }
 
-function displayQuestionWithData(q) {
-  const quizDiv = document.getElementById("quiz");
-  quizDiv.innerHTML = "";
-
-  const questionBox = document.createElement("div");
-  questionBox.className = "question";
-  questionBox.innerHTML = `<h3>מהו השריר במספר ${q.number} (${q.side})?</h3>`;
-
-  q.answers.forEach(answer => {
-    const btn = document.createElement("button");
-    btn.textContent = `${answer} — ${translations[answer] || ""}`;
-    btn.onclick = function () {
-      const allButtons = questionBox.querySelectorAll("button");
-      allButtons.forEach(b => b.disabled = true);
-      if (answer === q.correct) {
-        btn.style.background = "lightgreen";
-      } else {
-        btn.style.background = "salmon";
-        const correctText = `${q.correct} — ${translations[q.correct] || ""}`;
-        const correctBtn = [...allButtons].find(b => b.textContent === correctText);
-        if (correctBtn) correctBtn.style.background = "lightgreen";
-      }
-      document.getElementById("nextBtn").style.display = "inline-block";
-    };
-    questionBox.appendChild(btn);
-  });
-
-  quizDiv.appendChild(questionBox);
-}
-
 window.onload = () => {
-  currentQuestions = [];
-  const q = getRandomQuestion();
-  currentQuestions.push(q);
-  displayQuestionWithData(q);
+  nextQuestion();
 };
 </script>
 </body>
