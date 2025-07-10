@@ -51,6 +51,7 @@
       background: #eee;
       border-radius: 12px;
       overflow: hidden;
+      position: relative;
     }
     #progressFill {
       height: 100%;
@@ -58,13 +59,25 @@
       background: #4caf50;
       transition: width 0.3s ease;
     }
+    #progressText {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      left: 0;
+      line-height: 24px;
+      font-size: 0.9em;
+      color: #000;
+    }
   </style>
 </head>
 <body>
 
 <h1>חידון אנטומיה</h1>
 <div id="score">שאלות נכונות: 0 | שגויות: 0</div>
-<div id="progressBar"><div id="progressFill"></div></div>
+<div id="progressBar">
+  <div id="progressFill"></div>
+  <div id="progressText">0 / 0</div>
+</div>
 <div id="quiz"></div>
 <button id="prevBtn" onclick="prevQuestion()">חזרה לשאלה הקודמת</button>
 <button id="nextBtn" onclick="nextQuestion()">לשאלה הבאה</button>
@@ -167,6 +180,7 @@ function updateScore() {
   const percentage = Math.round((totalAnswered / totalQuestions) * 100);
   document.getElementById("score").textContent = `שאלות נכונות: ${correctCount} | שגויות: ${wrongCount}`;
   document.getElementById("progressFill").style.width = percentage + "%";
+  document.getElementById("progressText").textContent = `${totalAnswered} / ${totalQuestions}`;
 }
 
 function shuffle(array) {
@@ -250,3 +264,6 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
+
+
